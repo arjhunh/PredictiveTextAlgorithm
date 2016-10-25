@@ -1,0 +1,201 @@
+---
+title: "Data Science Capstone Milestone Report"
+author: "Arjhun Hariharan"
+date: "Sunday, November 16, 2014"
+output: html_document
+---
+#### Introduction : 
+
+The Coursera Capstone project involves building a predictive text model. When users type in a phrase, the model offers users choices for subsequent words, and allows users to minimize typing by choosing from among those words.
+
+This milestone report summarizes the exploratory analysis of the corpus (the body of text used to build the predictive model) that will be used for the Coursera Data Science Capstone project. The report concludes with a description of the proposed strategy for building the predictive text model. The purpose of this report is as follows:
+
+1. Demonstrate sucessful downloading of data
+2. Provide a brief summary of the corpus
+3. Get feedback on plans for developing a predictive model
+
+#### Quick analysis of the dataset : 
+
+
+```{r library, echo=FALSE, cache=TRUE,results='hide'}
+library(tm) # Framework for text mining.
+library(qdap)# Quantitative discourse analysis of transcripts.
+library(qdapDictionaries)
+library(dplyr) # Data preparation and pipes %>%.
+library(RColorBrewer) # Generate palette of colours for plots.library(ggplot2) # Plot word frequencies.
+library(scales) # Include commas in numbers.
+library(Rgraphviz) # Correlation plots.
+library(RWeka) ## N Grams
+library(wordcloud) ## wordcloud
+library(ggplot2)
+
+
+```
+
+The dataset came in a zip file. It was downloaded and extracted. It had three files from Twitter, Blogs and News. These files were loaded usiand a basic summary was seen.
+
+```{r summary, echo=FALSE, cache=TRUE}
+
+char1=208361438
+char2=15683765
+char3=162384825
+word1=37334131
+word2=2643969
+word3=30373543
+length1=899288
+length2=77259
+length3=2360148
+
+cat(sprintf("Summary of the blogs.txt file: \n \n\t Number of lines in the file: %d \n\tNumber of characters in the file: %d \n\tNumber of words in the file: %d", length1,char1,word1))
+
+cat(sprintf("Summary of the news.txt file: \n \n\t Number of lines in the file: %d \n\tNumber of characters in the file: %d \n\tNumber of words in the file: %d", length2,char2,word2))
+
+cat(sprintf("Summary of the twitter.txt file: \n \n\t Number of lines in the file: %d \n\tNumber of characters in the file: %d \n\tNumber of words in the file: %d", length3,char3,word3))
+```
+
+#### Sampling the dataset : 
+
+Since the dataset is too huge to handle, a sample of it was taken for cleaning and further analysis. Sampling was done randomly with the help of the rbinom function and for every true result, 30 lines were read from the dataset.
+
+Having known the length of the three files and keeping in mind the capacity of my computer, 5% of the total length of the twitter dataset, 5% of the blog dataset and 10% of the news dataset was sampled as the training set.
+
+The resultant sample was written into seperate text files that was used as the training set further in the analysis.
+
+
+#### Cleaning and tokenization:
+
+With the sample set in hand, the files were analysed and cleaning was done.
+
+The following were done as part of cleansing and processing:
+
+1. Characters were converted to lowercase.
+2. Some of the characters like [ ] ! ? etc. were removed.
+3. Numbers were not removed.
+4. All punctuations were removed.
+5. Any other alpha-numeric characters were removed.
+6. Some characters were not displayed properly. Those were managed.
+7. Profanity filtering was done.
+
+The Term Document Matrix was obtaining after tokenization. The package used was RWeka for generating bigrams and trigrams.
+
+
+#### Exploratory analyses:
+
+##### Uni-grams: 
+
+```{r uni0, echo=FALSE, cache=TRUE}
+
+cname <- file.path("E:/Dropbox/Courses/DATA SCIENCE TRACK/10. Capstone Project", "Dataset", "Processed")
+docs <- Corpus(DirSource(cname))
+tdm1 = TermDocumentMatrix(docs)
+tdms1 <- removeSparseTerms(tdm1, 0.1)
+
+```
+
+Here's a histogram of the most frequently occuring uni-grams:
+
+```{r uni1, echo=FALSE, cache=TRUE}
+
+freq1 <- sort(rowSums(as.matrix(tdms1)), decreasing=TRUE)
+wf1 <- data.frame(word=names(freq1), freq=freq1)
+subset(wf1, freq>1000) %>%
+  ggplot(aes(word, freq)) +
+  geom_bar(stat="identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+```
+
+Cloud of uni-grams occuring with a frequency of more than 10:
+  
+```{r uni2, echo=FALSE, cache=TRUE}
+
+wordcloud(names(freq1), freq1, min.freq=10, scale=c(5, 1), colors=brewer.pal(6, "Dark2"))
+
+```
+
+Correlation plot of uni-grams with a minimum frequency of 1000 and correlation threshold of 0.9:
+  
+```{r uni3, echo=FALSE,cache=TRUE}
+
+plot(tdms1,terms=findFreqTerms(tdms1, lowfreq=1000)[1:10],corThreshold=0.9)
+
+```
+
+##### Bi-grams: 
+
+```{r bi0, echo=FALSE, cache=TRUE}
+
+BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 2, max = 2, delimiters = " \\r\\n\\t.,;:\"()?!"))
+tdm2 <- TermDocumentMatrix(docs, control = list(tokenize = BigramTokenizer))
+tdms2 <- removeSparseTerms(tdm2, 0.1)
+
+```
+
+Here's a histogram of the most frequently occuring bi-grams:
+
+```{r bi1, echo=FALSE,cache=TRUE}
+
+freq2 <- sort(rowSums(as.matrix(tdms2)), decreasing=TRUE)
+wf2 <- data.frame(word=names(freq2), freq=freq2)
+subset(wf2, freq>3000) %>%
+  ggplot(aes(word, freq)) +
+  geom_bar(stat="identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+```
+
+Cloud of bi-grams occuring with a frequency of more than 1000:
+
+```{r bi2, echo=FALSE, cache=TRUE}
+
+wordcloud(names(freq2), freq2, min.freq=1000, scale=c(3, 0.5), colors=brewer.pal(6, "Dark2"))
+
+```
+
+Correlation plot of bi-grams with a minimum frequency of 1000 and correlation threshold of 0.9:
+
+```{r bi3, echo=FALSE, cache=TRUE}
+
+plot(tdms2,terms=findFreqTerms(tdms2, lowfreq=1000)[1:10],corThreshold=0.9)
+
+```
+
+##### Tri-grams: 
+
+```{r tri0, echo=FALSE,cache=TRUE}
+
+BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3, delimiters = " \\r\\n\\t.,;:\"()?!"))
+tdm3 <- TermDocumentMatrix(docs, control = list(tokenize = BigramTokenizer))
+tdms3 <- removeSparseTerms(tdm3, 0.1)
+
+```
+
+Here's a histogram of the most frequently occuring tri-grams:
+  
+```{r tri1, echo=FALSE, cache=TRUE}
+freq3 <- sort(rowSums(as.matrix(tdms3)), decreasing=TRUE)
+wf3 <- data.frame(word=names(freq3), freq=freq3)
+subset(wf3, freq>400) %>%
+  ggplot(aes(word, freq)) +
+  geom_bar(stat="identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+```
+
+Cloud of tri-grams occuring with a frequency of more than 250:
+  
+```{r tri2, echo=FALSE, cache=TRUE}
+
+wordcloud(names(freq3), freq3, min.freq=250, scale=c(2, 0.5), colors=brewer.pal(6, "Dark2"))
+
+```
+
+Correlation plot of tri-grams with a minimum frequency of 250 and correlation threshold of 0.9:
+  
+```{r tri3, echo=FALSE, cache=TRUE}
+
+plot(tdms3,terms=findFreqTerms(tdms3, lowfreq=250)[1:10],corThreshold=0.9)
+```
+
+
+#### Plan of action for the future:
+Having cleaned the data and obtaining the Term Document Matrix, the next step is to build the probability matrix. Once this is built, a predictive model has to be built around it to predict the next word in the typing sequence. Post the construction of the basic prediction model, it has to optimized as much as possible to make it lighter in terms of memory usage and time taken. To achieve this, there has to be some compromise on the accuracy of the moddel. Care has to be taken to make sure that there is an optimum balance between the performance and the accuracy of the model.

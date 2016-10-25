@@ -1,0 +1,14 @@
+base
+tm
+ggplot2
+qdapDictionaries
+qdapTools
+RColorBrewer
+qdap
+dplyr
+scales
+graph
+Rgraphviz
+RWeka
+Rcpp
+wordcloud

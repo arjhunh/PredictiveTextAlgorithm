@@ -1,0 +1,5 @@
+- First ran the sampling.R and sampled 5%... from each file. saved it under backup/sample into 3 seperate files
+- Then cleaned using 'cleaning data with stop words command.R' (but didnt use stop words command) and saved it under /Processed.
+- Then ran 'tokenization and analysis single gram.R' to tokenize uni, bri, tri...hex and saved these as csv files under /TDM.
+- then ran 'generating prob matrix.R'. Calculated the prob matrix for each uni, bi... hex and saved it under /prob mat.
+- then ran 'first step.R' which does the final product. Directions in the comments section.

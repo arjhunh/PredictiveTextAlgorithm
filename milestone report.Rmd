@@ -1,0 +1,110 @@
+---
+title: "Milestone report"
+author: "Arjhun Hariharan"
+date: "Sunday, November 16, 2014"
+output: html_document
+---
+
+#### Introduction : 
+
+Intro
+
+#### Quick analysis of the dataset : 
+
+The dataset came in a zip file. It was downloaded and extracted. It had three files from Twitter, Blogs and News. These files were loaded usiand a basic summary was seen.
+
+```{r loading, echo=FALSE, cache=TRUE,results='hide'}
+
+char1=208361438
+char2=15683765
+char3=162384825
+word1=37334131
+word2=2643969
+word3=30373543
+length1=899288
+length2=77259
+length3=2360148
+
+setwd("E:/Dropbox/Courses/DATA SCIENCE TRACK/10. Capstone Project/RPub1")
+```
+
+
+```{r eachsummary, echo=FALSE, cache=TRUE}
+
+cat(sprintf("Summary of the blogs.txt file: \n \n\t Number of lines in the file: %d \n\tNumber of characters in the file: %d \n\tNumber of words in the file: %d", length1,char1,word1))
+
+cat(sprintf("Summary of the news.txt file: \n \n\t Number of lines in the file: %d \n\tNumber of characters in the file: %d \n\tNumber of words in the file: %d", length2,char2,word2))
+
+cat(sprintf("Summary of the twitter.txt file: \n \n\t Number of lines in the file: %d \n\tNumber of characters in the file: %d \n\tNumber of words in the file: %d", length3,char3,word3))
+
+```
+
+#### Sampling the dataset : 
+
+Since the dataset is too huge to handle, a sample of it was taken for cleaning and further analysis. Sampling was done randomly with the help of the rbinom function and for every true result, 30 lines were read from the dataset.
+
+Having known the length of the three files and keeping in mind the capacity of my computer, 5% of the total length of the twitter dataset, 5% of the blog dataset and 10% of the news dataset was sampled as the training set.
+
+The resultant sample was written into seperate text files that was used as the training set further in the analysis.
+
+
+#### Cleaning and tokenization:
+
+With the sample set in hand, the files were analysed and cleaning was done.
+
+The following were done as part of cleansing and processing:
+
+1. Characters were converted to lowercase.
+2. Some of the characters like [ ] ! ? etc. were removed.
+3. Numbers were not removed.
+4. All punctuations were removed.
+5. Any other alpha-numeric characters were removed.
+6. Some characters were not displayed properly. Those were managed.
+7. Profanity filtering was done. Database from : 
+
+The Term Document Matrix was obtaining after tokenization. The package used was RWeka for generating bigrams and trigrams.
+
+
+#### Exploratory analyses:
+
+##### Unigrams: 
+
+Here's a histogram of the most frequently occuring words:
+
+![Uni1]("E:\Dropbox\Courses\DATA SCIENCE TRACK\10. Capstone Project\RPub1\unig1.png")
+
+Cloud of words occuring with a frequency of more than 500:
+
+![Uni2]("E:\Dropbox\Courses\DATA SCIENCE TRACK\10. Capstone Project\RPub1\unig2.png")
+
+Correlation plot of word with a minimum frequency of 100 and correlation threshold of 0.5:
+
+![Uni3]("E:\Dropbox\Courses\DATA SCIENCE TRACK\10. Capstone Project\RPub1\unig3.png")
+
+##### Bi-grams: 
+
+Here's a histogram of the most frequently occuring bi-grams:
+
+![Bi1]("E:\Dropbox\Courses\DATA SCIENCE TRACK\10. Capstone Project\RPub1\big1.png")
+
+Cloud of words occuring with a frequency of more than 500:
+
+![big2]("E:\Dropbox\Courses\DATA SCIENCE TRACK\10. Capstone Project\RPub1\big2.png")
+
+Correlation plot of word with a minimum frequency of 100 and correlation threshold of 0.5:
+
+![big3]("E:\Dropbox\Courses\DATA SCIENCE TRACK\10. Capstone Project\RPub1\big3.png")
+
+##### Tri-grams: 
+
+Here's a histogram of the most frequently occuring tri-grams:
+
+![trig1]("E:\Dropbox\Courses\DATA SCIENCE TRACK\10. Capstone Project\RPub1\trig1.png")
+
+Cloud of words occuring with a frequency of more than 500:
+
+![trig2]("E:\Dropbox\Courses\DATA SCIENCE TRACK\10. Capstone Project\RPub1\trig2.png")
+
+Correlation plot of word with a minimum frequency of 100 and correlation threshold of 0.5:
+
+![trig3]("E:\Dropbox\Courses\DATA SCIENCE TRACK\10. Capstone Project\RPub1\trig3.png")
